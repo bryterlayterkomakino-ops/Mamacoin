@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mamacoin Dashboard</title>
+  <!-- Apple Web App Metas für iPad Homescreen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mamacoin">
+  
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --color-jakob: #38bdf8;
+      --color-helene: #f472b6;
+      --color-emilia: #a78bfa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(167, 139, 250, 0.15) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #38bdf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+    }
+
+    .card.jakob::before { background: var(--color-jakob); box-shadow: 0 0 12px var(--color-jakob); }
+    .card.helene::before { background: var(--color-helene); box-shadow: 0 0 12px var(--color-helene); }
+    .card.emilia::before { background: var(--color-emilia); box-shadow: 0 0 12px var(--color-emilia); }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .card.jakob .avatar { color: var(--color-jakob); }
+    .card.helene .avatar { color: var(--color-helene); }
+    .card.emilia .avatar { color: var(--color-emilia); }
+
+    .name {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .balance-box {
+      text-align: right;
+    }
+
+    .balance-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .balance-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .loading-pulse {
+      animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .4; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">Mamacoin Vault</div>
+    <h1>Aktueller Kontostand</h1>
+  </header>
+
+  <main class="container" id="cards-container">
+    <div class="card jakob">
+      <div class="user-info">
+        <div class="avatar">J</div>
+        <div class="name">Jakob</div>
+      </div>
+      <div class="balance-box">
+        <div class="balance-label">Guthaben</div>
+        <div class="balance-value loading-pulse" id="balance-jakob">--,-- €</div>
+      </div>
+    </div>
+
+    <div class="card helene">
+      <div class="user-info">
+        <div class="avatar">H</div>
+        <div class="name">Helene</div>
+      </div>
+      <div class="balance-box">
+        <div class="balance-label">Guthaben</div>
+        <div class="balance-value loading-pulse" id="balance-helene">--,-- €</div>
+      </div>
+    </div>
+
+    <div class="card emilia">
+      <div class="user-info">
+        <div class="avatar">E</div>
+        <div class="name">Emilia</div>
+      </div>
+      <div class="balance-box">
+        <div class="balance-label">Guthaben</div>
+        <div class="balance-value loading-pulse" id="balance-emilia">--,-- €</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Live-Sync mit Google Sheets • Letztes Update: <span id="last-update">Gerade eben</span>
+  </footer>
+
+  <script>
+    // Die ID deiner Tabelle
+    const SHEET_ID = '1Ii-z4Us6llGLerN7qvSfnG-XgdsCm_Sp_XtHcADunrI';
+    // Abfrage des Dashboards über die Google Visualization API
+    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Dashboard`;
+
+    async function fetchBalances() {
+      try {
+        const response = await fetch(URL);
+        const text = await response.text();
+        
+        // Die API liefert JSON eingepackt in google.visualization.Query.setResponse(...)
+        const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+        const data = JSON.parse(jsonString);
+
+        const rows = data.table.rows;
+        rows.forEach(row => {
+          const name = row.c[0]?.v;
+          const balance = row.c[1]?.f || (typeof row.c[1]?.v === 'number' ? row.c[1].v.toFixed(2).replace('.', ',') + ' €' : row.c[1]?.v);
+          
+          if (!name) return;
+          const cleanName = name.trim().toLowerCase();
+          const targetEl = document.getElementById(`balance-${cleanName}`);
+          
+          if (targetEl && balance !== undefined) {
+            targetEl.textContent = balance;
+            targetEl.classList.remove('loading-pulse');
+          }
+        });
+
+        const now = new Date();
+        document.getElementById('last-update').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      } catch (err) {
+        console.error("Fehler beim Abrufen der Tabellendaten:", err);
+      }
+    }
+
+    // Beim Laden und alle 15 Sekunden automatisch abrufen
+    fetchBalances();
+    setInterval(fetchBalances, 15000);
+  </script>
+</body>
+</html>
