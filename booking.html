@@ -85,7 +85,6 @@
       margin-bottom: 0.5rem;
     }
 
-    /* Button-Gruppen */
     .button-group {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -112,7 +111,6 @@
       color: #fff;
     }
 
-    /* Aktion Tabs */
     .action-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -133,7 +131,6 @@
       color: #f87171;
     }
 
-    /* Input-Felder */
     .input-box {
       width: 100%;
       background: rgba(15, 23, 42, 0.6);
@@ -150,7 +147,6 @@
       border-color: var(--accent-blue);
     }
 
-    /* Schnellauswahl Beträge */
     .quick-amounts {
       display: flex;
       gap: 0.5rem;
@@ -168,7 +164,6 @@
       cursor: pointer;
     }
 
-    /* Submit Button */
     .submit-btn {
       margin-top: 0.5rem;
       width: 100%;
@@ -209,10 +204,20 @@
 
   <header>
     <div class="badge">Mamacoin Pay</div>
-    <h1 id="title-display">Transaktion erfassen</h1>
+    <h1>Transaktion erfassen</h1>
   </header>
 
-  <main class="card">
+  <!-- Unsichtbarer Frame für das Absenden im Hintergrund -->
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){handleSuccess();}"></iframe>
+
+  <form id="google-form" action="https://docs.google.com/forms/d/e/1FAIpQLSdnIDtbJLqU-auSLFBt2yIoOwjmqxQALRu2VOI1-bD4xJW6QA/formResponse" method="POST" target="hidden_iframe" class="card">
+    
+    <!-- Unsichtbare echte Formular-Inputs mit den exakten IDs -->
+    <input type="hidden" name="entry.640475232" id="field-kind" value="Jakob">
+    <input type="hidden" name="entry.461584892" id="field-action" value="Gutschrift (+)">
+    <input type="hidden" name="entry.625241700" id="field-amount" value="">
+    <input type="hidden" name="entry.1823325019" id="field-note" value="">
+
     <!-- Kind auswählen -->
     <div>
       <div class="section-title">Kind</div>
@@ -250,24 +255,17 @@
       <input type="text" class="input-box" id="note-input" placeholder="z. B. Eis, Taschengeld...">
     </div>
 
-    <button type="button" class="submit-btn" id="submit-btn" onclick="submitForm()">Buchen</button>
+    <button type="button" class="submit-btn" id="submit-btn" onclick="processSubmit()">Buchen</button>
     <div class="status-msg" id="status-msg"></div>
-  </main>
+  </form>
 
   <a href="index.html" class="nav-link">← Zurück zum Dashboard</a>
 
   <script>
-    // Die Google Form Action URL
-    const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdnIDtbJLqU-auSLFBt2yIoOwjmqxQALRu2VOI1-bD4xJW6QA/formResponse";
-    const ENTRY_KIND = "entry.640475232";
-    const ENTRY_AKTION = "entry.461584892";
-    const ENTRY_BETRAG = "entry.1748247065";
-    const ENTRY_ZWECK = "entry.1481878028";
-
+    let submitted = false;
     let selectedKind = "Jakob";
     let selectedAction = "Gutschrift (+)";
 
-    // URL-Parameter beim Laden auslesen (z. B. für gezielte NFC-Tags)
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       const k = params.get('kind');
@@ -278,7 +276,6 @@
       if (a === 'plus') selectAction('Gutschrift (+)');
     });
 
-    // Event Listener für Buttons
     document.querySelectorAll('[data-kind]').forEach(btn => {
       btn.addEventListener('click', () => selectKind(btn.dataset.kind));
     });
@@ -289,6 +286,7 @@
 
     function selectKind(kind) {
       selectedKind = kind;
+      document.getElementById('field-kind').value = kind;
       document.querySelectorAll('[data-kind]').forEach(b => {
         b.classList.toggle('active', b.dataset.kind.toLowerCase() === kind.toLowerCase());
       });
@@ -296,6 +294,7 @@
 
     function selectAction(action) {
       selectedAction = action;
+      document.getElementById('field-action').value = action;
       document.querySelectorAll('[data-action]').forEach(b => {
         b.classList.toggle('active', b.dataset.action === action);
       });
@@ -305,52 +304,39 @@
       document.getElementById('amount-input').value = val.toFixed(2);
     }
 
-    async function submitForm() {
-      const amount = document.getElementById('amount-input').value.replace(',', '.');
+    function processSubmit() {
+      const rawAmount = document.getElementById('amount-input').value.replace(',', '.');
       const note = document.getElementById('note-input').value;
       const statusEl = document.getElementById('status-msg');
       const submitBtn = document.getElementById('submit-btn');
 
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      if (!rawAmount || isNaN(rawAmount) || Number(rawAmount) <= 0) {
         statusEl.style.color = "var(--accent-red)";
         statusEl.textContent = "Bitte einen gültigen Betrag eingeben.";
         return;
       }
 
+      // Felder für das Google-Formular befüllen
+      document.getElementById('field-amount').value = rawAmount;
+      document.getElementById('field-note').value = note;
+
       submitBtn.disabled = true;
       submitBtn.textContent = "Wird gebucht...";
       statusEl.textContent = "";
 
-      const formData = new FormData();
-      formData.append(ENTRY_KIND, selectedKind);
-      formData.append(ENTRY_AKTION, selectedAction);
-      formData.append(ENTRY_BETRAG, amount);
-      formData.append(ENTRY_ZWECK, note);
+      submitted = true;
+      document.getElementById('google-form').submit();
+    }
 
-      try {
-        // no-cors Modus übermittelt das Google Form geräuschlos im Hintergrund
-        await fetch(FORM_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: formData
-        });
+    function handleSuccess() {
+      const statusEl = document.getElementById('status-msg');
+      statusEl.style.color = "var(--accent-green)";
+      statusEl.textContent = `✓ Buchung erfolgreich erfasst!`;
 
-        statusEl.style.color = "var(--accent-green)";
-        statusEl.textContent = `✓ ${amount} € für ${selectedKind} gebucht!`;
-        document.getElementById('amount-input').value = "";
-        document.getElementById('note-input').value = "";
-
-        // Nach 1,5 Sekunden automatisch zurück zum Dashboard leiten
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 1500);
-
-      } catch (err) {
-        statusEl.style.color = "var(--accent-red)";
-        statusEl.textContent = "Fehler bei der Buchung.";
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Buchen";
-      }
+      // Nach 1,5 Sekunden automatisch zum Dashboard weiterleiten
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1500);
     }
   </script>
 </body>
