@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mamacoin Buchung</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-blue: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(167, 139, 250, 0.12) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Button-Gruppen */
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .btn-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.75rem 0.5rem;
+      border-radius: 0.85rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .btn-select.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+      color: #fff;
+    }
+
+    /* Aktion Tabs */
+    .action-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .btn-action-plus.active {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+    }
+
+    .btn-action-minus.active {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--accent-red);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    /* Input-Felder */
+    .input-box {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 0.85rem;
+      padding: 0.85rem 1rem;
+      font-size: 1.1rem;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-box:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Schnellauswahl Beträge */
+    .quick-amounts {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .quick-btn {
+      flex: 1;
+      padding: 0.4rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      margin-top: 0.5rem;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      border: none;
+      border-radius: 0.85rem;
+      color: #0f172a;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 0.9rem;
+      min-height: 1.2rem;
+      font-weight: 600;
+    }
+
+    .nav-link {
+      display: block;
+      margin-top: 1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">Mamacoin Pay</div>
+    <h1 id="title-display">Transaktion erfassen</h1>
+  </header>
+
+  <main class="card">
+    <!-- Kind auswählen -->
+    <div>
+      <div class="section-title">Kind</div>
+      <div class="button-group">
+        <button type="button" class="btn-select" data-kind="Jakob">Jakob</button>
+        <button type="button" class="btn-select" data-kind="Helene">Helene</button>
+        <button type="button" class="btn-select" data-kind="Emilia">Emilia</button>
+      </div>
+    </div>
+
+    <!-- Art der Buchung -->
+    <div>
+      <div class="section-title">Aktion</div>
+      <div class="action-group">
+        <button type="button" class="btn-select btn-action-plus active" data-action="Gutschrift (+)">+ Gutschrift</button>
+        <button type="button" class="btn-select btn-action-minus" data-action="Ausgabe (-)">− Ausgabe</button>
+      </div>
+    </div>
+
+    <!-- Betrag -->
+    <div>
+      <div class="section-title">Betrag (€)</div>
+      <input type="number" step="0.50" min="0.01" class="input-box" id="amount-input" placeholder="0,00" inputmode="decimal">
+      <div class="quick-amounts">
+        <button type="button" class="quick-btn" onclick="setAmount(0.5)">0,50 €</button>
+        <button type="button" class="quick-btn" onclick="setAmount(1)">1,00 €</button>
+        <button type="button" class="quick-btn" onclick="setAmount(2)">2,00 €</button>
+        <button type="button" class="quick-btn" onclick="setAmount(5)">5,00 €</button>
+      </div>
+    </div>
+
+    <!-- Notiz -->
+    <div>
+      <div class="section-title">Notiz (Optional)</div>
+      <input type="text" class="input-box" id="note-input" placeholder="z. B. Eis, Taschengeld...">
+    </div>
+
+    <button type="button" class="submit-btn" id="submit-btn" onclick="submitForm()">Buchen</button>
+    <div class="status-msg" id="status-msg"></div>
+  </main>
+
+  <a href="index.html" class="nav-link">← Zurück zum Dashboard</a>
+
+  <script>
+    // Die Google Form Action URL
+    const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdnIDtbJLqU-auSLFBt2yIoOwjmqxQALRu2VOI1-bD4xJW6QA/formResponse";
+    const ENTRY_KIND = "entry.640475232";
+    const ENTRY_AKTION = "entry.461584892";
+    const ENTRY_BETRAG = "entry.1748247065";
+    const ENTRY_ZWECK = "entry.1481878028";
+
+    let selectedKind = "Jakob";
+    let selectedAction = "Gutschrift (+)";
+
+    // URL-Parameter beim Laden auslesen (z. B. für gezielte NFC-Tags)
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const k = params.get('kind');
+      const a = params.get('aktion');
+
+      if (k) selectKind(k);
+      if (a === 'minus') selectAction('Ausgabe (-)');
+      if (a === 'plus') selectAction('Gutschrift (+)');
+    });
+
+    // Event Listener für Buttons
+    document.querySelectorAll('[data-kind]').forEach(btn => {
+      btn.addEventListener('click', () => selectKind(btn.dataset.kind));
+    });
+
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => selectAction(btn.dataset.action));
+    });
+
+    function selectKind(kind) {
+      selectedKind = kind;
+      document.querySelectorAll('[data-kind]').forEach(b => {
+        b.classList.toggle('active', b.dataset.kind.toLowerCase() === kind.toLowerCase());
+      });
+    }
+
+    function selectAction(action) {
+      selectedAction = action;
+      document.querySelectorAll('[data-action]').forEach(b => {
+        b.classList.toggle('active', b.dataset.action === action);
+      });
+    }
+
+    function setAmount(val) {
+      document.getElementById('amount-input').value = val.toFixed(2);
+    }
+
+    async function submitForm() {
+      const amount = document.getElementById('amount-input').value.replace(',', '.');
+      const note = document.getElementById('note-input').value;
+      const statusEl = document.getElementById('status-msg');
+      const submitBtn = document.getElementById('submit-btn');
+
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        statusEl.style.color = "var(--accent-red)";
+        statusEl.textContent = "Bitte einen gültigen Betrag eingeben.";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Wird gebucht...";
+      statusEl.textContent = "";
+
+      const formData = new FormData();
+      formData.append(ENTRY_KIND, selectedKind);
+      formData.append(ENTRY_AKTION, selectedAction);
+      formData.append(ENTRY_BETRAG, amount);
+      formData.append(ENTRY_ZWECK, note);
+
+      try {
+        // no-cors Modus übermittelt das Google Form geräuschlos im Hintergrund
+        await fetch(FORM_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        });
+
+        statusEl.style.color = "var(--accent-green)";
+        statusEl.textContent = `✓ ${amount} € für ${selectedKind} gebucht!`;
+        document.getElementById('amount-input').value = "";
+        document.getElementById('note-input').value = "";
+
+        // Nach 1,5 Sekunden automatisch zurück zum Dashboard leiten
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
+
+      } catch (err) {
+        statusEl.style.color = "var(--accent-red)";
+        statusEl.textContent = "Fehler bei der Buchung.";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Buchen";
+      }
+    }
+  </script>
+</body>
+</html>
