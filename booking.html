@@ -1,81 +1,48 @@
-<script>
-    let submitted = false;
-    let selectedKind = "Jakob";
-    let selectedAction = "Gutschrift (+)";
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const k = params.get('kind');
-      const a = params.get('aktion');
-
-      if (k) selectKind(k);
-      if (a === 'minus') selectAction('Ausgabe (-)');
-      if (a === 'plus') selectAction('Gutschrift (+)');
-    });
-
-    document.querySelectorAll('[data-kind]').forEach(btn => {
-      btn.addEventListener('click', () => selectKind(btn.dataset.kind));
-    });
-
-    document.querySelectorAll('[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => selectAction(btn.dataset.action));
-    });
-
-    function selectKind(kind) {
-      selectedKind = kind;
-      document.getElementById('field-kind').value = kind;
-      document.querySelectorAll('[data-kind]').forEach(b => {
-        b.classList.toggle('active', b.dataset.kind.toLowerCase() === kind.toLowerCase());
-      });
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mamacoin Buchung</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-blue: #38bdf8;
     }
 
-    function selectAction(action) {
-      selectedAction = action;
-      document.getElementById('field-action').value = action;
-      document.querySelectorAll('[data-action]').forEach(b => {
-        b.classList.toggle('active', b.dataset.action === action);
-      });
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    function setAmount(val) {
-      // Schreibt den Wert ins Eingabefeld
-      document.getElementById('amount-input').value = val.toString().replace('.', ',');
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(167, 139, 250, 0.12) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
     }
 
-    function processSubmit() {
-      const rawInput = document.getElementById('amount-input').value.trim();
-      const note = document.getElementById('note-input').value.trim();
-      const statusEl = document.getElementById('status-msg');
-      const submitBtn = document.getElementById('submit-btn');
-
-      // Erlaubt sowohl 1,50 als auch 1.50
-      const normalizedNumber = parseFloat(rawInput.replace(',', '.'));
-
-      if (!rawInput || isNaN(normalizedNumber) || normalizedNumber <= 0) {
-        statusEl.style.color = "var(--accent-red)";
-        statusEl.textContent = "Bitte einen gültigen Betrag eingeben.";
-        return;
-      }
-
-      // Google Forms akzeptiert bei deutschem Sheet das Komma-Format
-      document.getElementById('field-amount').value = rawInput.replace('.', ',');
-      document.getElementById('field-note').value = note;
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Wird gebucht...";
-      statusEl.textContent = "";
-
-      submitted = true;
-      document.getElementById('google-form').submit();
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
     }
 
-    function handleSuccess() {
-      const statusEl = document.getElementById('status-msg');
-      statusEl.style.color = "var(--accent-green)";
-      statusEl.textContent = `✓ Buchung erfolgreich erfasst!`;
-
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1500);
-    }
-  </script>
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
