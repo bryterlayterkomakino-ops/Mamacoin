@@ -216,7 +216,9 @@
   </footer>
 
   <script>
+    // Die ID deiner Tabelle
     const SHEET_ID = '1Ii-z4Us6llGLerN7qvSfnG-XgdsCm_Sp_XtHcADunrI';
+    // Abfrage des Dashboards über die Google Visualization API
     const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Dashboard`;
 
     async function fetchBalances() {
@@ -224,6 +226,7 @@
         const response = await fetch(URL);
         const text = await response.text();
         
+        // Die API liefert JSON eingepackt in google.visualization.Query.setResponse(...)
         const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
         const data = JSON.parse(jsonString);
 
@@ -249,6 +252,7 @@
       }
     }
 
+    // Beim Laden und alle 15 Sekunden automatisch abrufen
     fetchBalances();
     setInterval(fetchBalances, 15000);
   </script>
