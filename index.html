@@ -42,6 +42,37 @@
       padding: 2rem 1rem;
     }
 
+    .top-nav {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 1.5rem;
+    }
+
+    .hub-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    .hub-link:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-2px);
+    }
+
     header {
       text-align: center;
       margin-bottom: 2.5rem;
@@ -171,6 +202,13 @@
 </head>
 <body>
 
+  <!-- Zurück zum Family Hub -->
+  <div class="top-nav">
+    <a href="https://familien-hub.devvniak.workers.dev" class="hub-link">
+      ← Family Hub
+    </a>
+  </div>
+
   <header>
     <div class="badge">Mamacoin Vault</div>
     <h1>Aktueller Kontostand</h1>
@@ -216,9 +254,7 @@
   </footer>
 
   <script>
-    // Die ID deiner Tabelle
     const SHEET_ID = '1Ii-z4Us6llGLerN7qvSfnG-XgdsCm_Sp_XtHcADunrI';
-    // Abfrage des Dashboards über die Google Visualization API
     const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Dashboard`;
 
     async function fetchBalances() {
@@ -226,7 +262,6 @@
         const response = await fetch(URL);
         const text = await response.text();
         
-        // Die API liefert JSON eingepackt in google.visualization.Query.setResponse(...)
         const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
         const data = JSON.parse(jsonString);
 
@@ -252,7 +287,6 @@
       }
     }
 
-    // Beim Laden und alle 15 Sekunden automatisch abrufen
     fetchBalances();
     setInterval(fetchBalances, 15000);
   </script>
